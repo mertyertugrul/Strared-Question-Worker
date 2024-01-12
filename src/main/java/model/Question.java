@@ -1,4 +1,4 @@
-package question;
+package model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +15,5 @@ public class Question {
         this.note = note;
         this.timesSolved = 0;
     }
-    
+
 }
