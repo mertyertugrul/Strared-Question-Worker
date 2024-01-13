@@ -2,12 +2,14 @@ package model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
 public class Question {
     private String id;
     private String note;
+    @Setter
     private int timesSolved;
 
     public Question(String id, String note) {

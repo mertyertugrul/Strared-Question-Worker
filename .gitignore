@@ -5,6 +5,8 @@ build/
 !**/src/test/**/build/
 .src/main/resources/
 src/main/resources/questions/StaredQuestions.txt
+.data/
+src/main/resources/config.properties
 
 ### IntelliJ IDEA ###
 .idea/
