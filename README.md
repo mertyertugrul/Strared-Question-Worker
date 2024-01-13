@@ -6,6 +6,8 @@ The returned ID is selected from minimum number of
 timed solved questions. Therefor, less solved questions
 prioritized.
 
+Plus, adds the ID to the clipboard.
+
 # Usage
 The resource file format is like this:
 ```text
