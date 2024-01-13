@@ -42,18 +42,8 @@ public class FileQuestionRepository implements QuestionRepository {
     }
 
     private Question parseLineToQuestion(String line1, String line2) {
-
-        String[] lineInfo = line1.split("\\.");
-        String id = new StringBuilder()
-                .append(lineInfo[lineInfo.length - 3])
-                .append(".")
-                .append(lineInfo[lineInfo.length - 2])
-                .append(".")
-                .append(lineInfo[lineInfo.length - 1])
-                .toString();
-
-        return new Question(id.substring(1), line2.subSequence(0, line2.length() - 1).toString());
-
+        String id = line1.split(",")[1];
+        return new Question(id, line2.subSequence(0, line2.length() - 1).toString());
     }
 
 
