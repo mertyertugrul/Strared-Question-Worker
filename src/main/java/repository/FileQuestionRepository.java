@@ -18,9 +18,18 @@ public class FileQuestionRepository implements QuestionRepository {
     private final Random random = new Random();
     private final int minTimesSolved = questionDao.getMinTimesSolved();
 
+    private static FileQuestionRepository instance = null;
 
-    public FileQuestionRepository(String resourceFileName) {
+
+    private FileQuestionRepository(String resourceFileName) {
         loadQuestionsFromResource(resourceFileName);
+    }
+
+    public static FileQuestionRepository getInstance(String resourceFileName){
+        if (instance == null){
+            instance = new FileQuestionRepository(resourceFileName);
+        }
+        return instance;
     }
 
     private void loadQuestionsFromResource(String resourceFileName) {
@@ -47,21 +56,6 @@ public class FileQuestionRepository implements QuestionRepository {
     }
 
 
-    @Override
-    public Optional<Question> findById(String id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Question> findAll() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Question getRandomQuestion() {
-        return null;
-    }
-
     private List<Question> getMinTimesSolvedQuestions() {
         List<Question> minTimesSolvedQuestions = new ArrayList<>();
         for (Question question : questions) {
@@ -81,6 +75,7 @@ public class FileQuestionRepository implements QuestionRepository {
 
     @Override
     public List<Question> getRandomQuestions(int randomQuestionsCount) {
+        refreshQuestionsFromDatabase();
         List<Question> minTimesSolvedQuestions = getMinTimesSolvedQuestions();
         List<Question> randomQuestions = new ArrayList<>();
         for (int i = 0; i < randomQuestionsCount; i++) {
@@ -94,5 +89,10 @@ public class FileQuestionRepository implements QuestionRepository {
         return randomQuestions;
     }
 
+
+    public void refreshQuestionsFromDatabase() {
+        questions.clear();
+        questions.addAll(questionDao.getAllQuestions());
+    }
 
 }

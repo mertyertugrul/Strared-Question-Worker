@@ -18,4 +18,9 @@ public class Question {
         this.timesSolved = 0;
     }
 
+    public Question(String id, String note, int timesSolved) {
+        this.id = id;
+        this.note = note;
+        this.timesSolved = timesSolved;
+    }
 }

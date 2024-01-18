@@ -9,7 +9,7 @@ public class Application {
         DatabaseInitializer.initializeDatabase();
         String path = ResourceService.findResource("src/main/resources/questions")
                 .orElseThrow(() -> new RuntimeException("Resource file not found"));
-        FileQuestionRepository fileQuestionRepository = new FileQuestionRepository(path);
+        FileQuestionRepository fileQuestionRepository = FileQuestionRepository.getInstance(path);
         CommandProcessor commandProcessor = new CommandProcessor(fileQuestionRepository);
         commandProcessor.starProcessing();
         System.out.println("Application terminated");

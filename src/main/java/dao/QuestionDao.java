@@ -7,6 +7,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,5 +80,24 @@ public class QuestionDao {
             throw new RuntimeException("Error while retrieving min timesSolved", e);
         }
 
+    }
+
+    public Collection<Question> getAllQuestions() {
+        List<Question> questions = new ArrayList<>();
+        String sql = "SELECT * FROM questions";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String id = rs.getString("id");
+                    String note = rs.getString("note");
+                    int timesSolved = rs.getInt("timesSolved");
+                    questions.add(new Question(id, note, timesSolved));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error while retrieving all questions", e);
+        }
+        return questions;
     }
 }
