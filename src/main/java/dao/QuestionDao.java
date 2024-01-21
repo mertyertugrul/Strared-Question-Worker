@@ -1,6 +1,7 @@
 package dao;
 
 import model.Question;
+import model.QuestionStar;
 import util.DatabaseConnection;
 
 import java.sql.Connection;
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,12 +94,55 @@ public class QuestionDao {
                     String id = rs.getString("id");
                     String note = rs.getString("note");
                     int timesSolved = rs.getInt("timesSolved");
-                    questions.add(new Question(id, note, timesSolved));
+                    int star = rs.getInt("star");
+                    if(star !=0)
+                        questions.add(new Question(id, note, timesSolved, QuestionStar.fromInt(star)));
+                    else
+                        questions.add(new Question(id, note, timesSolved));
                 }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error while retrieving all questions", e);
         }
         return questions;
+    }
+
+    public boolean updateQuestion(Question question) {
+        boolean isUpdated = false;
+        String sql = "UPDATE questions SET note = ?, timesSolved = ?, star =? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, question.getNote());
+            pstmt.setInt(2, question.getTimesSolved());
+            pstmt.setInt(3, question.getStar().ordinal() + 1);
+            pstmt.setString(4, question.getId());
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                isUpdated = true;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Updating question failed", e);
+        }
+        return isUpdated;
+    }
+
+    public List<Question> findQuestions(Predicate<Question> p) {
+        return getAllQuestions().stream()
+                .filter(p)
+                .toList();
+    }
+
+    public int getStarQuestionsCount(QuestionStar star) {
+        return findQuestions(question -> question.getStar() == star).size();
+    }
+
+    public int getUnsolvedQuestionsCount() {
+        return findQuestions(question -> question.getTimesSolved() == getMinTimesSolved()).size();
+    }
+
+    public int getSolvedQuestionsCount() {
+        return findQuestions(question -> question.getTimesSolved() > getMinTimesSolved()).size();
     }
 }

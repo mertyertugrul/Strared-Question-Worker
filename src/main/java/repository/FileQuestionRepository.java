@@ -2,6 +2,7 @@ package repository;
 
 import dao.QuestionDao;
 import model.Question;
+import model.QuestionStar;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -17,7 +18,6 @@ public class FileQuestionRepository implements QuestionRepository {
     private final QuestionDao questionDao = new QuestionDao();
     private final Random random = new Random();
     private final int minTimesSolved = questionDao.getMinTimesSolved();
-
     private static FileQuestionRepository instance = null;
 
 
@@ -25,8 +25,8 @@ public class FileQuestionRepository implements QuestionRepository {
         loadQuestionsFromResource(resourceFileName);
     }
 
-    public static FileQuestionRepository getInstance(String resourceFileName){
-        if (instance == null){
+    public static FileQuestionRepository getInstance(String resourceFileName) {
+        if (instance == null) {
             instance = new FileQuestionRepository(resourceFileName);
         }
         return instance;
@@ -89,6 +89,39 @@ public class FileQuestionRepository implements QuestionRepository {
         return randomQuestions;
     }
 
+    @Override
+    public boolean starQuestion(String questionId, QuestionStar star) {
+        refreshQuestionsFromDatabase();
+        Question question = getQuestionById(questionId);
+        if (question == null) return false;
+        setQuestionStar(question, star);
+        return questionDao.updateQuestion(question);
+    }
+
+    @Override
+    public int getUnsolvedQuestionsCount() {
+        List<Question> unsolvedQuestions = questionDao
+                .findQuestions((Question question) -> question.getTimesSolved() == minTimesSolved);
+        return unsolvedQuestions.size();
+    }
+
+    @Override
+    public int getSolvedQuestionsCount() {
+        List<Question> solvedQuestions = questionDao
+                .findQuestions((Question question) -> question.getTimesSolved() > minTimesSolved);
+        return solvedQuestions.size();
+    }
+
+    private Question getQuestionById(String questionId) {
+        return questions.stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void setQuestionStar(Question question, QuestionStar star) {
+        question.setStar(star);
+    }
 
     public void refreshQuestionsFromDatabase() {
         questions.clear();
